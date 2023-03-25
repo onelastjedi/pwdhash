@@ -25,7 +25,7 @@ begin
   size:= length(plain) + length(prefix);
   nonalpha:= re.Exec(plain);
 
-  if RunCommand(
+  RunCommand(
     '/bin/bash', 
     [
       '-c',
@@ -35,8 +35,15 @@ begin
       + ' -binary | openssl enc -base64 -A'
     ],
     digest
-  )
-  then writeln(digest);
+  );
+
+  if digest = '' then
+  begin
+    writeln('OpenSSL is not installed. Exited.');
+    exit;
+  end;
+
+  writeln(digest);
   
   writeln(size);
 end.
