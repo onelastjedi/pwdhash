@@ -1,8 +1,13 @@
+{ Program pwdhash generate hash based on
+  domain and plain password }
 program pwdhash;
 
+{ Use regular expressions
+  and os process }
 uses
   RegExpr, Process;
 
+{ Operate with variables }
 var
   re: TRegExpr;
   uri: string;
@@ -11,20 +16,15 @@ var
   prefix: string;
   size: integer;
   nonalpha: boolean;
-  
-begin
-  re:= TRegExpr.Create;
-  re.Expression:= '\W';
-  prefix:= '@@';
 
+begin
+  { Get user input }
   write('Domain: ');
   readln(uri);
   write('Password: ');
   readln(plain);
 
-  size:= length(plain) + length(prefix);
-  nonalpha:= re.Exec(plain);
-
+  { Run openssl to get digest }
   RunCommand(
     '/bin/bash', 
     [
@@ -37,13 +37,20 @@ begin
     digest
   );
 
+  { Exit if no openssl installed }
   if digest = '' then
   begin
     writeln('OpenSSL is not installed. Exited.');
     exit;
   end;
 
-  writeln(digest);
+  { Set desired vars }
+  prefix:= '@@';
+  re:= TRegExpr.Create;
+  re.Expression:= '\W';
+  size:= length(plain) + length(prefix);
+  nonalpha:= re.Exec(plain);
   
+  writeln(digest);
   writeln(size);
 end.
